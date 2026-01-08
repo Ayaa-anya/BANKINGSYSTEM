@@ -35,6 +35,11 @@ public class BankAccount {
         this.accountHolderName = accountHolderName;
     }
 
+    // Minimal change: allow child class to update balance
+    protected void setBalance(double balance) {
+        this.balance = balance;
+    }
+
     public void deposit(double amount) {
         if (amount > 0) {
             balance += amount;
@@ -59,14 +64,19 @@ public class BankAccount {
         System.out.println("Current balance: $" + balance);
     }
 
-    private void addTransaction(String transaction) {
+    // Minimal change: allow child class (SavingsAccount) to log transactions
+    protected void addTransaction(String transaction) {
         transactionHistory.add(transaction);
     }
 
     public void displayTransactionHistory() {
         System.out.println("Transaction History for Account " + accountNumber + ":");
-        for (String transaction : transactionHistory) {
-            System.out.println("- " + transaction);
+        if (transactionHistory.isEmpty()) {
+            System.out.println("No transactions yet.");
+        } else {
+            for (String transaction : transactionHistory) {
+                System.out.println("- " + transaction);
+            }
         }
     }
 }
