@@ -1,70 +1,80 @@
 import java.util.ArrayList;
 import java.util.List;
 
-public class SavingsAccount {
-    private String accountNumber;
-    private String accountHolderName;
-    private double balance;
+public class SavingsAccount extends BankAccount {
     private double interestRate;
-    private String password;
-    private List<String> transactions;
+    private String password;  // Added password field
+    private List<String> transactionHistory; // Added transaction history
 
-    public SavingsAccount(String accountNumber, String accountHolderName, double balance, double interestRate, String password) {
-        this.accountNumber = accountNumber;
-        this.accountHolderName = accountHolderName;
-        this.balance = balance;
+    // Updated constructor to include password
+    public SavingsAccount(String accountNumber, String accountHolderName, double initialBalance, double interestRate, String password) {
+        super(accountNumber, accountHolderName, initialBalance);
         this.interestRate = interestRate;
         this.password = password;
-        this.transactions = new ArrayList<>();
-        applyInterest(); // Apply interest automatically when account is created
+        this.transactionHistory = new ArrayList<>();
     }
 
-    public String getAccountNumber() {
-        return accountNumber;
+    // Getter and setter for interest rate
+    public double getInterestRate() {
+        return interestRate;
     }
 
-    public String getAccountHolderName() {
-        return accountHolderName;
+    public void setInterestRate(double interestRate) {
+        this.interestRate = interestRate;
     }
 
+    // Getter and setter for password
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    // Deposit method with transaction history
     public void deposit(double amount) {
         if (amount > 0) {
-            balance += amount;
-            transactions.add("Deposit: +" + amount);
-            applyInterest();
-            System.out.println("Deposited: " + amount);
+            setBalance(getBalance() + amount);
+            transactionHistory.add("Deposited: $" + amount);
+            System.out.println("Deposited $" + amount + " successfully.");
         } else {
             System.out.println("Invalid deposit amount.");
         }
     }
 
+    // Withdraw method with transaction history
     public void withdraw(double amount) {
-        if (amount > 0 && amount <= balance) {
-            balance -= amount;
-            transactions.add("Withdrawal: -" + amount);
-            applyInterest();
-            System.out.println("Withdrawn: " + amount);
+        if (amount > 0 && amount <= getBalance()) {
+            setBalance(getBalance() - amount);
+            transactionHistory.add("Withdrew: $" + amount);
+            System.out.println("Withdrew $" + amount + " successfully.");
         } else {
             System.out.println("Invalid withdrawal amount or insufficient funds.");
         }
     }
 
+    // Check balance
     public void checkBalance() {
-        applyInterest();
-        System.out.println("Current balance: " + balance);
+        System.out.println("Current balance: $" + getBalance());
     }
 
+    // Apply interest (kept your original logic but adds transaction history)
     public void applyInterest() {
-        double interest = balance * (interestRate / 100);
-        balance += interest;
-        transactions.add("Interest applied: +" + interest);
-        System.out.println("Interest applied automatically: " + interest);
+        double interest = getBalance() * (interestRate / 100);
+        deposit(interest); // deposit method will also record transaction
+        System.out.println("Interest applied: $" + interest + " at " + interestRate + "% rate.");
     }
 
-    public void printTransactionHistory() {
-        System.out.println("Transaction History for " + accountHolderName + ":");
-        for (String t : transactions) {
-            System.out.println(t);
+    // Display transaction history
+    public void displayTransactionHistory() {
+        System.out.println("Transaction History for " + getAccountHolderName() + ":");
+        if (transactionHistory.isEmpty()) {
+            System.out.println("No transactions yet.");
+        } else {
+            for (String transaction : transactionHistory) {
+                System.out.println(transaction);
+            }
         }
     }
 }
