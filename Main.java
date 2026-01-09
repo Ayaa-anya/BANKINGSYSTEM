@@ -28,15 +28,11 @@ class SavingsAccount {
         return accountHolderName;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
     public void deposit(double amount) {
         if (amount > 0) {
             balance += amount;
             transactions.add("Deposit: +" + amount);
-            applyInterest(); // automatically apply interest after deposit
+            applyInterest();
             System.out.println("Deposited: " + amount);
         } else {
             System.out.println("Invalid deposit amount.");
@@ -47,7 +43,7 @@ class SavingsAccount {
         if (amount > 0 && amount <= balance) {
             balance -= amount;
             transactions.add("Withdrawal: -" + amount);
-            applyInterest(); // automatically apply interest after withdrawal
+            applyInterest();
             System.out.println("Withdrawn: " + amount);
         } else {
             System.out.println("Invalid withdrawal amount or insufficient funds.");
@@ -55,7 +51,7 @@ class SavingsAccount {
     }
 
     public void checkBalance() {
-        applyInterest(); // automatically apply interest before showing balance
+        applyInterest();
         System.out.println("Current balance: " + balance);
     }
 
@@ -64,20 +60,6 @@ class SavingsAccount {
         balance += interest;
         transactions.add("Interest applied: +" + interest);
         System.out.println("Interest applied automatically: " + interest);
-    }
-
-    public void transfer(SavingsAccount receiver, double amount) {
-        if (amount > 0 && amount <= balance) {
-            balance -= amount;
-            receiver.balance += amount;
-            transactions.add("Transferred " + amount + " to " + receiver.getAccountHolderName());
-            receiver.transactions.add("Received " + amount + " from " + accountHolderName);
-            applyInterest();       // apply interest to sender
-            receiver.applyInterest(); // apply interest to receiver
-            System.out.println("Transferred " + amount + " to " + receiver.getAccountHolderName());
-        } else {
-            System.out.println("Invalid transfer amount or insufficient funds.");
-        }
     }
 
     public void printTransactionHistory() {
@@ -92,6 +74,7 @@ public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         List<SavingsAccount> accounts = new ArrayList<>();
+        // Default accounts with default interest rates
         accounts.add(new SavingsAccount("12345", "Alice Johnson", 1000.0, 5.0, "1234"));
         accounts.add(new SavingsAccount("67890", "Bob Smith", 500.0, 4.0, "1234"));
 
@@ -110,13 +93,12 @@ public class Main {
             String name = scanner.nextLine();
             System.out.print("Enter initial deposit: ");
             double initialDeposit = scanner.nextDouble();
-            System.out.print("Enter interest rate (e.g., 5 for 5%): ");
-            double interestRate = scanner.nextDouble();
             scanner.nextLine();
             System.out.print("Set a password for your account: ");
             String password = scanner.nextLine();
             String accountNumber = String.valueOf(10000 + accounts.size() + 1);
-            currentAccount = new SavingsAccount(accountNumber, name, initialDeposit, interestRate, password);
+            // Use a default interest rate of 5% for new accounts
+            currentAccount = new SavingsAccount(accountNumber, name, initialDeposit, 5.0, password);
             accounts.add(currentAccount);
             System.out.println("Account created successfully!");
             System.out.println("Account Number: " + accountNumber);
@@ -132,7 +114,7 @@ public class Main {
             scanner.nextLine();
             if (choice > 0 && choice <= accounts.size()) {
                 currentAccount = accounts.get(choice - 1);
-                currentAccount.applyInterest(); // automatically apply interest on login
+                currentAccount.applyInterest();
                 System.out.println("Logged in as " + currentAccount.getAccountHolderName());
             } else {
                 System.out.println("Invalid selection. Exiting.");
@@ -147,9 +129,8 @@ public class Main {
             System.out.println("1. Check Balance");
             System.out.println("2. Deposit");
             System.out.println("3. Withdraw");
-            System.out.println("4. Transfer");
-            System.out.println("5. Transaction History");
-            System.out.println("6. Exit");
+            System.out.println("4. Transaction History");
+            System.out.println("5. Exit");
             System.out.print("Enter choice: ");
             option = scanner.nextInt();
             scanner.nextLine();
@@ -166,36 +147,12 @@ public class Main {
                     double withdrawAmount = scanner.nextDouble();
                     currentAccount.withdraw(withdrawAmount);
                 }
-                case 4 -> {
-                    System.out.println("Available accounts:");
-                    for (SavingsAccount acc : accounts) {
-                        if (!acc.equals(currentAccount)) {
-                            System.out.println(acc.getAccountHolderName() + " (Account: " + acc.getAccountNumber() + ")");
-                        }
-                    }
-                    System.out.print("Enter receiver account number: ");
-                    String accNumber = scanner.next();
-                    SavingsAccount receiver = null;
-                    for (SavingsAccount acc : accounts) {
-                        if (acc.getAccountNumber().equals(accNumber)) {
-                            receiver = acc;
-                            break;
-                        }
-                    }
-                    if (receiver != null) {
-                        System.out.print("Enter amount to transfer: ");
-                        double transferAmount = scanner.nextDouble();
-                        currentAccount.transfer(receiver, transferAmount);
-                    } else {
-                        System.out.println("Receiver account not found.");
-                    }
-                }
-                case 5 -> currentAccount.printTransactionHistory();
-                case 6 -> System.out.println("Thank you for using the Java Banking System!");
+                case 4 -> currentAccount.printTransactionHistory();
+                case 5 -> System.out.println("Thank you for using the Java Banking System!");
                 default -> System.out.println("Invalid option.");
             }
-        } while (option != 6);
+        } while (option != 5);
 
-        scanner.close(); // close scanner at the very end
+        scanner.close(); // close scanner
     }
 }
